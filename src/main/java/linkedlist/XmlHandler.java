@@ -13,11 +13,24 @@ public class XmlHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName,
                              Attributes attributes) throws SAXException {
-        //System.out.println("Start element");
+         System.out.println("Start element");
 
         // Check if this is an opening element for a product
-        // If so, store each of its attribute values
-        // Determine type of product (taxable vs. nontaxable)
+        if (qName.equals("product")) {
+
+            // If so, store each of its attribute values
+            String name = attributes.getValue("name");
+            String isbn = attributes.getValue("isbn");
+            String price = attributes.getValue("unitPrice");
+            String type = attributes.getValue("taxable");
+
+            // Determine type of product (taxable vs. nontaxable)
+            if (attributes.getValue("taxable") !=null && type.contentEquals("true")){
+                currentProduct=new TaxableProduct(name, isbn, Double.parseDouble(price));
+            }else {
+                currentProduct=new NonTaxableProduct(name, isbn, Double.parseDouble(price));
+            }
+        }
     }
 
     @Override
@@ -25,10 +38,13 @@ public class XmlHandler extends DefaultHandler {
         //System.out.println("End element");
 
         // check if this is a closing element for a product
-        // If so, add the current product to the product list
+        if (qName.equals("product")) {
 
+            // If so, add the current product to the product list
+            productList.add(currentProduct);
+
+        }
     }
-
     // Return a reference to the product list
     public ProductList getProducts() {
         return productList;
